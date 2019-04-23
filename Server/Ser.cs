@@ -1,10 +1,10 @@
 ﻿using System;
 using System.ServiceModel;
+using System.ServiceModel.Web;
 using System.ServiceModel.Description;
 
 namespace Client
-{
-    class Program
+{    class Program
     {
         static void Main()
         {
@@ -23,10 +23,20 @@ namespace Client
                 "net.pipe://localhost/wcfpipe"
             );
             host.AddServiceEndpoint(
+                typeof(Calculator.ICalculator),
+                new NetTcpBinding(),
+                "net.tcp://localhost:9999/calculator"
+            );
+            host.AddServiceEndpoint(
                 ServiceMetadataBehavior.MexContractName,
                 MetadataExchangeBindings.CreateMexNamedPipeBinding(),
                 "net.pipe://localhost/metadane"
             );
+            host.AddServiceEndpoint(
+                typeof(Calculator.ICalculator),
+                new WebHttpBinding(),
+                "service"
+            ).EndpointBehaviors.Add(new WebHttpBehavior());
 
             host.Open();
             Console.WriteLine("The Calculator Server starts !");

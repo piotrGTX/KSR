@@ -2,92 +2,48 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.ServiceModel;
-
+using System.ServiceModel.Web;
+using System.Text;
 
 namespace Calculator
 {
-
-    public interface IZwrotny
-    {
-        [OperationContract(IsOneWay = true)]
-        void UstawProcent(int a);
-
-        [OperationContract(IsOneWay = true)]
-
-        void UstawWynik(double a);
-    }
-
-    [ServiceContract(CallbackContract = typeof(IZwrotny))]
+  
+    [ServiceContract]
     public interface ICalculator
     {
-        /*
         [OperationContract]
-        int Add(int a, int b);
+        [WebGet(UriTemplate = "add/{a}/{b}", ResponseFormat = WebMessageFormat.Json)]
+        double Add(string a, string b);
+
         [OperationContract]
-        int Eval(Data data);
-        */
+        [WebGet(UriTemplate = "sub/{a}/{b}", ResponseFormat = WebMessageFormat.Json)]
+        double Sub(string a, string b);
 
-        [OperationContract(IsOneWay = true)]
-        void WykonajObliczenia();
-
-        [OperationContract(IsOneWay = true)]
-        void Dodaj(double a, double b);
-
-        [OperationContract(IsOneWay = true)]
-        void ustawSekret(double newSecret);
+        [OperationContract]
+        [WebInvoke(UriTemplate = "form", Method = "POST")]
+        string formularz(Stream stream);
     }
 
-    [DataContract]
-    public class Data
-    {
-        [DataMember]
-        public int arg1 { get; set; }
-        [DataMember]
-        public int arg2 { get; set; }
-        [DataMember]
-        public char op { get; set; }
-    }
 
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerCall)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession)]
     public class Calculator : ICalculator
     {
-        /*
-        public int Add(int a, int b)
-        {
-            if (a == b)
-            {
-                throw new FaultException("Same numbers");
-            }
-            return a + b + 1;
-        }
-
-        public int Eval(Data data)
-        {
-            switch(data.op)
-            {
-                case '-': return data.arg1 - data.arg2;
-                case '*': return data.arg1 * data.arg2;
-                case '/': return data.arg1 / data.arg2;
-            }
-            return data.arg1 + data.arg2;
-        }
-        */
-
         private double secret = 0;
 
-        public void WykonajObliczenia()
+        public double Add(string a, string b)
         {
-            var zw = OperationContext.Current.GetCallbackChannel<IZwrotny>();
-            zw.UstawProcent((int) secret);
+            return double.Parse(a) + double.Parse(b);
         }
-         
-        public void Dodaj(double a, double b)
-        {
-            double wynik = a + b;
 
-            var zw = OperationContext.Current.GetCallbackChannel<IZwrotny>();
-            zw.UstawWynik(wynik);
-           
+        public string formularz(Stream stream)
+        {
+            StreamReader streamReader = new StreamReader(stream);
+            return "Form: " + streamReader.ReadToEnd();
+        }
+
+        public double Sub(string a, string b)
+        {
+            return double.Parse(a) - double.Parse(b);
         }
 
         public void ustawSekret(double newSecret)
