@@ -23,6 +23,7 @@ namespace Client
             host.Description.Behaviors.Add(new ServiceDiscoveryBehavior());
             host.AddServiceEndpoint(new UdpDiscoveryEndpoint("soap.udp://localhost:54321"));
 
+                
             host.Open();
             Console.WriteLine("The Calculator Server starts !");
             Console.ReadKey();

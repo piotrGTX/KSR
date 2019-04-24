@@ -5,7 +5,8 @@ using System.ServiceModel.Description;
 using System.ServiceModel.Discovery;
 using System.ServiceModel.Web;
 
-namespace Client {
+namespace Client {
+
     class Program
     {
         static void Main()
