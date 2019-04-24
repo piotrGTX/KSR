@@ -1,42 +1,27 @@
 ﻿using System;
 using System.ServiceModel;
-using System.ServiceModel.Web;
 using System.ServiceModel.Description;
+using System.ServiceModel.Discovery;
+using System.ServiceModel.Web;
 
 namespace Client
 {    class Program
     {
         static void Main()
         {
-            var host = new ServiceHost(typeof(Calculator.Calculator), new Uri[] { new Uri("http://localhost:1100") });
-
-            var serverMetadata = host.Description.Behaviors.Find<ServiceMetadataBehavior>();
-            if (serverMetadata == null)
-            {
-                serverMetadata = new ServiceMetadataBehavior();
-            }
-            host.Description.Behaviors.Add(serverMetadata);
+            
+            var host = new ServiceHost(typeof(Calculator.Calculator), new Uri("http://localhost:2200"));
 
             host.AddServiceEndpoint(
                 typeof(Calculator.ICalculator), 
-                new NetNamedPipeBinding(), 
-                "net.pipe://localhost/wcfpipe"
-            );
-            host.AddServiceEndpoint(
-                typeof(Calculator.ICalculator),
-                new NetTcpBinding(),
-                "net.tcp://localhost:9999/calculator"
-            );
-            host.AddServiceEndpoint(
-                ServiceMetadataBehavior.MexContractName,
-                MetadataExchangeBindings.CreateMexNamedPipeBinding(),
-                "net.pipe://localhost/metadane"
-            );
-            host.AddServiceEndpoint(
-                typeof(Calculator.ICalculator),
                 new WebHttpBinding(),
                 "service"
-            ).EndpointBehaviors.Add(new WebHttpBehavior());
+            ).Behaviors.Add(new WebHttpBehavior());
+            
+            //var host = new WebServiceHost(typeof(Calculator.ICalculator), new Uri("http://localhost:2200/service"));
+
+            host.Description.Behaviors.Add(new ServiceDiscoveryBehavior());
+            host.AddServiceEndpoint(new UdpDiscoveryEndpoint("soap.udp://localhost:54321"));
 
             host.Open();
             Console.WriteLine("The Calculator Server starts !");
