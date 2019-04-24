@@ -2,6 +2,7 @@
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using System.ServiceModel.Discovery;
+using System.ServiceModel.Routing;
 using System.ServiceModel.Web;
 
 namespace Client
@@ -23,7 +24,9 @@ namespace Client
             host.Description.Behaviors.Add(new ServiceDiscoveryBehavior());
             host.AddServiceEndpoint(new UdpDiscoveryEndpoint("soap.udp://localhost:54321"));
 
-                
+            var cfg = new RoutingConfiguration();
+            host.Extensions.Find<RoutingExtension>().ApplyConfiguration(cfg);
+
             host.Open();
             Console.WriteLine("The Calculator Server starts !");
             Console.ReadKey();

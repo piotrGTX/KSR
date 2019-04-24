@@ -56,7 +56,7 @@ namespace Client {
 
             if (clients.Count > 0)
             {
-                EndpointAddress addr = clients[0].Address;
+                EndpointAddress addr = clients[0].Address;  
                 Console.WriteLine("Znaleziono klienta {0}", addr);
                 standardClient(addr, func);
             }
